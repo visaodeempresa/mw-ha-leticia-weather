@@ -76,12 +76,15 @@ SENSORES: tuple[DescricaoClima, ...] = (
         icon="mdi:arrow-expand-vertical",
         valor=lambda r: r.agora.spread,
         atributos=lambda r: {
+            # Frase que cabe DENTRO da fala da Letícia ("...e agora eles estão
+            # {leitura}"), não um rótulo solto: rótulo bom de tela vira frase
+            # torta na voz.
             "leitura": (
-                "modelos de acordo"
+                "de acordo"
                 if (r.agora.spread or 0) < 1
-                else "discordância moderada"
+                else "discordando um pouco"
                 if (r.agora.spread or 0) < 2.5
-                else "modelos discordam bastante"
+                else "discordando bastante"
             ),
             "modelos": len(r.agora.por_modelo),
         },
