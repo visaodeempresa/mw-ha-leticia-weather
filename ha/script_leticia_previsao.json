@@ -1,0 +1,40 @@
+{
+  "alias": "Letícia — previsão do tempo",
+  "description": "Responde a previsão do tempo de QUALQUER cidade do mundo, ou do local da casa quando nenhuma cidade for dita. Use quando perguntarem sobre tempo, temperatura, chuva, sol ou clima de um lugar diferente de casa, ou quando quiserem os próximos dias ou o fim de semana.",
+  "mode": "parallel",
+  "max": 10,
+  "fields": {
+    "cidade": {
+      "name": "Cidade",
+      "description": "Nome da cidade. Deixe vazio para o local da casa.",
+      "required": false,
+      "selector": { "text": null }
+    },
+    "periodo": {
+      "name": "Período",
+      "description": "agora, hoje, amanha, fim_de_semana ou proximos",
+      "required": false,
+      "default": "agora",
+      "selector": { "select": { "options": ["agora", "hoje", "amanha", "fim_de_semana", "proximos"] } }
+    },
+    "dias": {
+      "name": "Dias",
+      "description": "Quantos dias resumir quando o período for proximos",
+      "required": false,
+      "default": 3,
+      "selector": { "number": { "min": 1, "max": 14, "mode": "box" } }
+    }
+  },
+  "sequence": [
+    {
+      "action": "mw_leticia_weather.previsao",
+      "data": {
+        "cidade": "{{ cidade | default('', true) }}",
+        "periodo": "{{ periodo | default('agora', true) }}",
+        "dias": "{{ dias | default(3, true) | int }}"
+      },
+      "response_variable": "resposta"
+    },
+    { "stop": "pronto", "response_variable": "resposta" }
+  ]
+}

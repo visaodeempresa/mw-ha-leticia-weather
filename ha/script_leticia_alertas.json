@@ -1,0 +1,22 @@
+{
+  "alias": "Letícia — alertas de clima",
+  "description": "Responde se há alertas meteorológicos (clima seco, calor, frio, tempestade, chuva forte, vento) para a casa ou para qualquer cidade do mundo. Traz os oficiais do órgão do país e também os calculados a partir da previsão.",
+  "mode": "parallel",
+  "max": 10,
+  "fields": {
+    "cidade": {
+      "name": "Cidade",
+      "description": "Nome da cidade. Deixe vazio para o local da casa.",
+      "required": false,
+      "selector": { "text": null }
+    }
+  },
+  "sequence": [
+    {
+      "action": "mw_leticia_weather.alertas",
+      "data": { "cidade": "{{ cidade | default('', true) }}" },
+      "response_variable": "resposta"
+    },
+    { "stop": "pronto", "response_variable": "resposta" }
+  ]
+}
