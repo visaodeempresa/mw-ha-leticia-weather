@@ -108,7 +108,7 @@ jobs:
           cd custom_components/mw_leticia_weather
           zip -r "$GITHUB_WORKSPACE/mw_leticia_weather.zip" . -x "__pycache__/*"
 
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.v.outputs.proxima }}
           name: ${{ steps.v.outputs.proxima }}
