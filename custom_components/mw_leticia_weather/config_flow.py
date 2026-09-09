@@ -57,13 +57,15 @@ from .const import (
 )
 
 
-def _esquema(hass, dados: dict[str, Any] | None = None) -> vol.Schema:
+def _esquema(
+    hass, dados: dict[str, Any] | None = None, *, opcoes: bool = False
+) -> vol.Schema:
     dados = dados or {}
     local = dados.get(SECAO_LOCAL, {})
     fusao = dados.get(SECAO_FUSAO, {})
     alertas = dados.get(SECAO_ALERTAS, {})
     calibracao = dados.get(SECAO_CALIBRACAO, {})
-    return vol.Schema(
+    base = vol.Schema(
         {
             vol.Required(SECAO_LOCAL): section(
                 vol.Schema(
@@ -139,10 +141,21 @@ def _esquema(hass, dados: dict[str, Any] | None = None) -> vol.Schema:
                 ),
                 {"collapsed": True},
             ),
-            # NASCE DESLIGADA. Decisão do dono em 2026-09-09: a calibração é
-            # poderosa e por isso perigosa — um sensor de janela com desvio
-            # arrastaria o número principal sem ninguém perceber. Quando ligada,
-            # publica entidade SEPARADA.
+        }
+    )
+    if not opcoes:
+        # A CALIBRAÇÃO SÓ APARECE NAS OPÇÕES, e por dois motivos.
+        # 1. Ela nasce DESLIGADA (decisão do dono em 2026-09-09): é poderosa e
+        #    por isso perigosa — um sensor de janela com desvio arrastaria o
+        #    número principal sem ninguém perceber.
+        # 2. Ninguém escolhe o sensor externo antes de a integração existir. E
+        #    um `EntitySelector` opcional na tela de instalação é armadilha:
+        #    submetido vazio, o flow recusa com «Entity  is neither a valid
+        #    entity ID nor a valid UUID» — sem dizer que o culpado é o campo
+        #    vazio. Medido no HA 2026.9.1.
+        return base
+    return base.extend(
+        {
             vol.Required(SECAO_CALIBRACAO): section(
                 vol.Schema(
                     {
@@ -152,7 +165,16 @@ def _esquema(hass, dados: dict[str, Any] | None = None) -> vol.Schema:
                         ): BooleanSelector(),
                         vol.Optional(
                             CONF_SENSOR_LOCAL,
-                            default=calibracao.get(CONF_SENSOR_LOCAL, ""),
+                            # SEM `default=""`: o EntitySelector valida o
+                            # default ao ENVIAR o formulário, e string vazia
+                            # não é entity_id nem UUID — o flow recusa com
+                            # «Entity  is neither a valid entity ID nor a
+                            # valid UUID» sem dizer que o culpado é o próprio
+                            # default. Valor já escolhido volta por
+                            # `suggested_value`.
+                            description={
+                                "suggested_value": calibracao.get(CONF_SENSOR_LOCAL)
+                            },
                         ): EntitySelector(
                             EntitySelectorConfig(
                                 domain="sensor", device_class="temperature"
