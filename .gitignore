@@ -6,3 +6,9 @@ __pycache__/
 secrets.yaml
 .ruff_cache/
 .pytest_cache/
+
+# Skills e agentes CANÔNICOS moram no harness (IA/) e chegam aqui por symlink
+# para conveniência local. Versionar o symlink publicaria o caminho absoluto do
+# SSD privado do dono dentro de um repositório público.
+.claude/skills/mw-clima/
+.claude/agents/

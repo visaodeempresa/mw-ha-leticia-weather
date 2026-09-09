@@ -1,1 +1,0 @@
-/Volumes/SSD-T1-01/CLAUDE-SSD/IA/skills/mw-clima/SKILL.md
