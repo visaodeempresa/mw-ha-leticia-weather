@@ -1,0 +1,159 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualidade:
+    name: ruff + testes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements-test.txt
+      - name: ruff
+        run: ruff check custom_components tests tools
+      - name: testes
+        run: pytest
+
+  hassfest:
+    name: hassfest (validador oficial do HA)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    # ⚠️ INFORMATIVA, e não por preguiça: a ação do HACS lê os arquivos do
+    # repositório pela API do GitHub, e num repositório PRIVADO ela recebe
+    # `None` — o sintoma são exatamente estas duas falhas, sempre juntas:
+    #   <Validation hacsjson> failed: invalid 'hacs.json'
+    #   <Validation integration_manifest> failed: expected a dictionary. Got None
+    # Não é a hacs.json: foi reduzida à única chave obrigatória e falhou igual.
+    # Bate com o que já se sabia — o HACS não instala de repositório privado,
+    # ele responde «success» e nunca lista o componente.
+    #
+    # Deixar o job VERMELHO para sempre seria pior que não tê-lo: CI que vive
+    # vermelha ensina todo mundo a ignorar vermelho. Fica aqui, sem travar o
+    # merge, pronta para voltar a valer se o repositório abrir um dia.
+    name: validação do HACS (informativa — repo privado)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hacs/action@main
+        with:
+          category: integration
+          # `brands`  — o componente não está no repositório de marcas do HA,
+          #             e não vai estar: é de uso próprio.
+          # `license` — a licença é PROPRIETÁRIA por decisão do dono, então o
+          #             SPDX volta como NOASSERTION. Não é descuido.
+          # O resto das oito verificações continua valendo e reprovando.
+          ignore: brands license
+
+  coerencia:
+    name: o escopo continua fechado?
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: a versão do manifest é a do pyproject
+        run: |
+          M=$(python -c "import json;print(json.load(open('custom_components/mw_leticia_weather/manifest.json'))['version'])")
+          P=$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)
+          echo "manifest=$M pyproject=$P"
+          [ "$M" = "$P" ] || { echo "::error::versão fora de sincronia"; exit 1; }
+      - name: o manifest está na ordem que o hassfest exige
+        run: |
+          # domain, name, depois ordem alfabética. O hassfest reprova por isso
+          # e a mensagem não diz qual chave está fora do lugar.
+          python - <<'PY'
+          import json, pathlib, sys
+          d = json.loads(pathlib.Path(
+              "custom_components/mw_leticia_weather/manifest.json").read_text())
+          chaves = list(d)
+          esperado = ["domain", "name"] + sorted(
+              k for k in d if k not in ("domain", "name"))
+          if chaves != esperado:
+              print(f"::error::manifest fora de ordem.\n  está:    {chaves}\n"
+                    f"  deveria: {esperado}")
+              sys.exit(1)
+          print("manifest na ordem certa")
+          PY
+      - name: nenhuma tradução com sinal de menor/maior
+        run: |
+          # O hassfest recusa `<qualquer coisa>` numa string de tradução: ele
+          # lê como HTML. «&k=<segredo>» parecia inofensivo e reprovou o CI.
+          if grep -rlE '"[^"]*<[a-zA-Z/][^"]*>' \
+               custom_components/mw_leticia_weather/strings.json \
+               custom_components/mw_leticia_weather/translations/; then
+            echo "::error::tradução com sinal de menor/maior — o hassfest lê como HTML"
+            exit 1
+          fi
+          echo "traduções limpas ✓"
+
+      - name: os módulos puros continuam puros
+        run: |
+          # `fontes/`, `fusao`, `alertas`, `fala`, `codigos` e `montagem` NÃO
+          # podem importar homeassistant: é o que deixa os testes rodarem sem
+          # HA instalado e o que impede uma segunda verdade entre a integração
+          # e os scripts de tools/.
+          set -euo pipefail
+          ALVOS="custom_components/mw_leticia_weather/fontes \
+                 custom_components/mw_leticia_weather/fusao.py \
+                 custom_components/mw_leticia_weather/alertas.py \
+                 custom_components/mw_leticia_weather/fala.py \
+                 custom_components/mw_leticia_weather/codigos.py \
+                 custom_components/mw_leticia_weather/montagem.py"
+          if grep -rn "^\s*\(import\|from\) homeassistant" $ALVOS; then
+            echo "::error::módulo puro importando homeassistant"
+            exit 1
+          fi
+          python - <<'PY'
+          import pathlib, sys, types
+          raiz = pathlib.Path("custom_components/mw_leticia_weather")
+          for nome, caminho in (("mww", raiz), ("mww.fontes", raiz / "fontes")):
+              m = types.ModuleType(nome); m.__path__ = [str(caminho)]; sys.modules[nome] = m
+          from mww import alertas, codigos, fala, fusao, montagem  # noqa: F401
+          from mww.fontes import ar, avisos_inmet, avisos_nws, geocodificacao, open_meteo  # noqa: F401
+          print("módulos puros importam sem HA ✓")
+          PY
+
+      - name: nenhuma coordenada de casa versionada
+        run: |
+          # A coordenada do dono é o dado mais sensível desta integração. Ela
+          # tem lugar: o config entry (que não é versionado) e as fixtures de
+          # teste, onde é ponto de grade público, não endereço.
+          set -euo pipefail
+          if git grep -nE '\-1[0-9]\.[0-9]{4,}' -- ':!tests/fixtures' ':!docs' ':!*.md' ':!.github'; then
+            echo "::error::coordenada com precisão de rua em arquivo versionado"
+            exit 1
+          fi
+          echo "sem coordenada exposta ✓"
+
+      - name: os limiares de alerta são os do INMET
+        run: |
+          python - <<'PY'
+          import pathlib, sys, types
+          raiz = pathlib.Path("custom_components/mw_leticia_weather")
+          m = types.ModuleType("mww"); m.__path__ = [str(raiz)]; sys.modules["mww"] = m
+          from mww import alertas
+          # Baixa umidade: 30 / 20 / 12 % é a régua publicada pelo INMET e é a
+          # que aparece no celular do dono. Mudar sem decisão explícita faria a
+          # casa avisar em hora diferente do órgão oficial.
+          assert alertas.LIMIARES["clima_seco"] == {
+              "potencial": 30.0, "perigo": 20.0, "grande_perigo": 12.0
+          }, alertas.LIMIARES["clima_seco"]
+          assert alertas.LIMIARES["chuva_forte"]["potencial"] == 20.0
+          print("limiares alinhados com o INMET ✓")
+          PY

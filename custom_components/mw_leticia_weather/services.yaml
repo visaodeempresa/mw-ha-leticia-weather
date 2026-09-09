@@ -1,0 +1,52 @@
+previsao:
+  fields:
+    cidade:
+      required: false
+      example: Lisboa
+      selector:
+        text:
+    entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: mw_leticia_weather
+    periodo:
+      required: false
+      default: agora
+      selector:
+        select:
+          options:
+            - agora
+            - hoje
+            - amanha
+            - fim_de_semana
+            - proximos
+    dias:
+      required: false
+      default: 3
+      selector:
+        number:
+          min: 1
+          max: 14
+          mode: box
+
+alertas:
+  fields:
+    cidade:
+      required: false
+      example: Uberlândia
+      selector:
+        text:
+    entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: mw_leticia_weather
+
+comparar_fontes:
+  fields:
+    entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: mw_leticia_weather

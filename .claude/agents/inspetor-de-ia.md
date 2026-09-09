@@ -1,0 +1,1 @@
+/Volumes/SSD-T1-01/CLAUDE-SSD/IA/agents/inspetor-de-ia.md

@@ -1,0 +1,75 @@
+# Frases locais de clima para a Letícia.
+#
+# DESTINO (as duas pastas, de propósito):
+#   /config/custom_sentences/pt-BR/clima.yaml
+#   /config/custom_sentences/pt/clima.yaml
+# O hassil NÃO faz fallback de variante: o pipeline fala `pt-BR` e o diretório
+# `pt/` sozinho nunca é lido — e vice-versa. Armadilha já paga nesta casa.
+#
+# POR QUE ISTO EXISTE: o pipeline está com `prefer_local_intents: true`. Frase
+# que casa aqui NUNCA chega ao LLM — resposta instantânea e token zero. O
+# cérebro conversacional só entra no que é aberto (cidade estrangeira, pergunta
+# solta).
+language: "pt-BR"
+intents:
+  MWTempoAgora:
+    data:
+      - sentences:
+          - "qual (a|é a) temperatura"
+          - "quantos graus (está|estão| ) fazendo"
+          - "quantos graus faz"
+          - "como (está|tá) o tempo"
+          - "como (está|tá) o clima"
+          - "está frio (lá fora|)"
+          - "está calor (lá fora|)"
+          - "qual a umidade (do ar|)"
+  MWTempoHoje:
+    data:
+      - sentences:
+          - "(qual|como está) a previsão (de|para) hoje"
+          - "como (fica|vai ficar) o (tempo|dia) hoje"
+          - "vai chover hoje"
+          - "qual a máxima de hoje"
+          - "qual a mínima de hoje"
+  MWTempoAmanha:
+    data:
+      - sentences:
+          - "(qual|como está) a previsão (de|para) amanhã"
+          - "como (fica|vai ficar) o tempo amanhã"
+          - "vai chover amanhã"
+  MWTempoFimDeSemana:
+    data:
+      - sentences:
+          - "como (fica|vai ficar) o (tempo|clima) (no|neste|nesse|do) fim de semana"
+          - "(qual|como está) a previsão (do|para o) fim de semana"
+          - "vai chover no fim de semana"
+          - "vai dar praia no fim de semana"
+  MWTempoProximos:
+    data:
+      - sentences:
+          - "(qual|como está) a previsão (dos|para os) próximos dias"
+          - "como (fica|vai ficar) o tempo (nos|esses|nesses) próximos dias"
+          - "vai chover essa semana"
+          - "como fica a semana"
+  MWTempoAlertas:
+    data:
+      - sentences:
+          - "tem (algum|) alerta (de tempo|de clima|meteorológico|)"
+          - "tem (alerta|aviso) de tempestade"
+          - "tem (alerta|aviso) de chuva"
+          - "o (ar|tempo) está seco"
+          - "tem alerta de (baixa umidade|umidade baixa)"
+          - "tem (algum|) aviso do inmet"
+  MWTempoSol:
+    data:
+      - sentences:
+          - "que horas o sol (se põe|vai se pôr|põe)"
+          - "que horas (o sol nasce|amanhece|escurece|anoitece)"
+          - "a que horas o sol nasce"
+  MWTempoFontes:
+    data:
+      - sentences:
+          - "de onde vem essa temperatura"
+          - "as previsões (estão|batem) de acordo"
+          - "os modelos (concordam|discordam)"
+          - "qual a confiança da previsão"

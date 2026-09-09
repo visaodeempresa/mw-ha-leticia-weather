@@ -1,0 +1,74 @@
+# Respostas locais de clima. APPEND idempotente em /config/despertar_intents.yaml
+# (que já é incluído por `intent_script: !include despertar_intents.yaml`).
+#
+# ARMADILHA CONTORNADA: `speech` NÃO enxerga `response_variable` de `action`.
+# É por isso que aqui não há `action:` nenhuma — a frase já vem pronta como
+# ATRIBUTO do sensor, montada em pt-BR pela própria integração. Sem helper de
+# relay, sem `input_text`, sem segunda verdade.
+#
+# A busca do sensor é por ATRIBUTO, não por entity_id: assim o mesmo arquivo
+# serve para qualquer nome de local, e não quebra se o dono renomear a entidade.
+
+MWTempoAgora:
+  speech:
+    text: >-
+      {% set s = states.sensor | selectattr('attributes.fala_agora','defined')
+                               | map(attribute='entity_id') | list | first %}
+      {{ state_attr(s,'fala_agora') if s else 'Ainda não tenho a previsão do tempo aqui.' }}
+
+MWTempoHoje:
+  speech:
+    text: >-
+      {% set s = states.sensor | selectattr('attributes.fala_hoje','defined')
+                               | map(attribute='entity_id') | list | first %}
+      {{ state_attr(s,'fala_hoje') if s else 'Ainda não tenho a previsão de hoje.' }}
+
+MWTempoAmanha:
+  speech:
+    text: >-
+      {% set s = states.sensor | selectattr('attributes.fala_amanha','defined')
+                               | map(attribute='entity_id') | list | first %}
+      {{ state_attr(s,'fala_amanha') if s else 'Ainda não tenho a previsão de amanhã.' }}
+
+MWTempoFimDeSemana:
+  speech:
+    text: >-
+      {% set s = states.sensor | selectattr('attributes.fala_fim_de_semana','defined')
+                               | map(attribute='entity_id') | list | first %}
+      {{ state_attr(s,'fala_fim_de_semana') if s else 'Ainda não alcanço o fim de semana.' }}
+
+MWTempoProximos:
+  speech:
+    text: >-
+      {% set s = states.sensor | selectattr('attributes.fala_proximos','defined')
+                               | map(attribute='entity_id') | list | first %}
+      {{ state_attr(s,'fala_proximos') if s else 'Ainda não tenho os próximos dias.' }}
+
+MWTempoAlertas:
+  speech:
+    text: >-
+      {% set s = states.sensor | selectattr('attributes.fala_alertas','defined')
+                               | map(attribute='entity_id') | list | first %}
+      {{ state_attr(s,'fala_alertas') if s else 'Não consigo consultar os alertas agora.' }}
+
+MWTempoSol:
+  speech:
+    text: >-
+      {% set s = states.sensor | selectattr('attributes.fala_sol','defined')
+                               | map(attribute='entity_id') | list | first %}
+      {{ state_attr(s,'fala_sol') if s else 'Não tenho os horários do sol agora.' }}
+
+# A resposta para «de onde vem esse número». Lê a confiança e o número de
+# modelos direto do sensor de confiança — é a honestidade virando fala.
+MWTempoFontes:
+  speech:
+    text: >-
+      {% set c = states.sensor | selectattr('attributes.leitura','defined')
+                               | selectattr('attributes.modelos','defined')
+                               | map(attribute='entity_id') | list | first %}
+      {% if c %}
+      A temperatura vem de {{ state_attr(c,'modelos') }} modelos de previsão fundidos,
+      e agora eles estão com {{ state_attr(c,'leitura') }}.
+      {% else %}
+      Ainda não consegui comparar as fontes.
+      {% endif %}
