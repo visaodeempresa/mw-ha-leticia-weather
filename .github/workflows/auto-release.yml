@@ -17,11 +17,17 @@ on:
 permissions:
   contents: write
 
+# Uma release por vez: dois disparos seguidos corriam e o segundo
+# morria em `cannot lock ref 'refs/heads/main'`.
+concurrency:
+  group: auto-release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -89,7 +95,14 @@ jobs:
           else
             git tag -a "${{ steps.v.outputs.proxima }}" -m "${{ steps.v.outputs.proxima }}"
           fi
-          git push origin HEAD:main --follow-tags
+          # Rebase antes de empurrar: entre o checkout e este passo alguém
+          # pode ter empurrado, e o bot perdia a corrida com `cannot lock ref`.
+          git pull --rebase --autostash origin main
+          git push origin HEAD:main --follow-tags || {
+            sleep 5
+            git pull --rebase --autostash origin main
+            git push origin HEAD:main --follow-tags
+          }
           # E leva o bump de volta para develop. Sem isto, develop fica atrás
           # de main a CADA release: quem for trabalhar amanhã parte de um
           # manifest com a versão velha, e o próximo merge chega com um
@@ -108,7 +121,7 @@ jobs:
           cd custom_components/mw_leticia_weather
           zip -r "$GITHUB_WORKSPACE/mw_leticia_weather.zip" . -x "__pycache__/*"
 
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.v.outputs.proxima }}
           name: ${{ steps.v.outputs.proxima }}
