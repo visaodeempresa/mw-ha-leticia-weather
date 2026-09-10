@@ -91,28 +91,71 @@
   },
   "entity": {
     "sensor": {
-      "temperatura": { "name": "Temperatura" },
-      "sensacao": { "name": "Sensação térmica" },
-      "confianca": { "name": "Confiança (discórdia entre modelos)" },
-      "umidade": { "name": "Umidade" },
-      "pressao": { "name": "Pressão ao nível do mar" },
-      "vento": { "name": "Vento" },
-      "direcao_vento": { "name": "Direção do vento" },
-      "uv": { "name": "Índice UV" },
-      "pm25": { "name": "PM2.5" },
-      "aqi": { "name": "Qualidade do ar" },
-      "chuva_probabilidade": { "name": "Chance de chuva" },
-      "alertas": { "name": "Alertas" },
-      "previsao": { "name": "Previsão falada" }
+      "temperatura": {
+        "name": "Temperatura"
+      },
+      "sensacao": {
+        "name": "Sensação térmica"
+      },
+      "confianca": {
+        "name": "Confiança (discórdia entre modelos)"
+      },
+      "umidade": {
+        "name": "Umidade"
+      },
+      "pressao": {
+        "name": "Pressão ao nível do mar"
+      },
+      "vento": {
+        "name": "Vento"
+      },
+      "direcao_vento": {
+        "name": "Direção do vento"
+      },
+      "uv": {
+        "name": "Índice UV"
+      },
+      "pm25": {
+        "name": "PM2.5"
+      },
+      "aqi": {
+        "name": "Qualidade do ar"
+      },
+      "chuva_probabilidade": {
+        "name": "Chance de chuva"
+      },
+      "alertas": {
+        "name": "Alertas"
+      },
+      "previsao": {
+        "name": "Previsão falada"
+      },
+      "temperatura_calibrada": {
+        "name": "Temperatura calibrada pelo sensor da casa"
+      }
     },
     "binary_sensor": {
-      "clima_seco": { "name": "Clima seco" },
-      "calor": { "name": "Calor" },
-      "frio": { "name": "Frio" },
-      "chuva_forte": { "name": "Chuva forte" },
-      "tempestade": { "name": "Tempestade" },
-      "vento_forte": { "name": "Vento forte" },
-      "uv": { "name": "Radiação UV" }
+      "clima_seco": {
+        "name": "Clima seco"
+      },
+      "calor": {
+        "name": "Calor"
+      },
+      "frio": {
+        "name": "Frio"
+      },
+      "chuva_forte": {
+        "name": "Chuva forte"
+      },
+      "tempestade": {
+        "name": "Tempestade"
+      },
+      "vento_forte": {
+        "name": "Vento forte"
+      },
+      "uv": {
+        "name": "Radiação UV"
+      }
     }
   },
   "services": {
@@ -120,25 +163,46 @@
       "name": "Previsão",
       "description": "Devolve a previsão de um local configurado ou de qualquer cidade do mundo, com uma frase pronta para falar.",
       "fields": {
-        "cidade": { "name": "Cidade", "description": "Nome livre. Deixe vazio para usar um local configurado." },
-        "entry_id": { "name": "Local", "description": "Qual local configurado usar." },
-        "periodo": { "name": "Período", "description": "agora, hoje, amanha, fim_de_semana ou proximos." },
-        "dias": { "name": "Dias", "description": "Quantos dias resumir quando o período for proximos." }
+        "cidade": {
+          "name": "Cidade",
+          "description": "Nome livre. Deixe vazio para usar um local configurado."
+        },
+        "entry_id": {
+          "name": "Local",
+          "description": "Qual local configurado usar."
+        },
+        "periodo": {
+          "name": "Período",
+          "description": "agora, hoje, amanha, fim_de_semana ou proximos."
+        },
+        "dias": {
+          "name": "Dias",
+          "description": "Quantos dias resumir quando o período for proximos."
+        }
       }
     },
     "alertas": {
       "name": "Alertas",
       "description": "Alertas oficiais e derivados de um local configurado ou de qualquer cidade do mundo.",
       "fields": {
-        "cidade": { "name": "Cidade", "description": "Nome livre. Deixe vazio para usar um local configurado." },
-        "entry_id": { "name": "Local", "description": "Qual local configurado usar." }
+        "cidade": {
+          "name": "Cidade",
+          "description": "Nome livre. Deixe vazio para usar um local configurado."
+        },
+        "entry_id": {
+          "name": "Local",
+          "description": "Qual local configurado usar."
+        }
       }
     },
     "comparar_fontes": {
       "name": "Comparar fontes",
       "description": "Mostra modelo a modelo, o consenso, a discórdia e o ponto de grade — a resposta para quando dois aplicativos discordam.",
       "fields": {
-        "entry_id": { "name": "Local", "description": "Qual local configurado usar." }
+        "entry_id": {
+          "name": "Local",
+          "description": "Qual local configurado usar."
+        }
       }
     }
   }

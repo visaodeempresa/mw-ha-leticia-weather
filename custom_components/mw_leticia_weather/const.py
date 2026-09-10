@@ -22,7 +22,6 @@ SECAO_CALIBRACAO: Final = "calibracao"
 CONF_NOME: Final = "nome"
 CONF_LATITUDE: Final = "latitude"
 CONF_LONGITUDE: Final = "longitude"
-CONF_ALTITUDE: Final = "altitude"
 CONF_MODELOS: Final = "modelos"
 CONF_INTERVALO: Final = "intervalo_min"
 CONF_APRENDER_PESOS: Final = "aprender_pesos"
@@ -71,11 +70,11 @@ MODELOS_ROTULO: Final = {
 # uma entidade SEPARADA, nunca sobrescreve a fundida.
 CALIBRAR_PADRAO: Final = False
 
-SINAL_DADOS: Final = f"{DOMAIN}_dados"
 STORE_VERSAO: Final = 1
 STORE_PESOS: Final = f"{DOMAIN}.pesos"
 STORE_GEO: Final = f"{DOMAIN}.geocodificacao"
 
-ATRIBUICAO: Final = (
-    "Open-Meteo (ECMWF, GFS, ICON, MET Norway) · INMET · NWS · MeteoAlarm"
-)
+# Só o que é REALMENTE consultado. A primeira versão creditava o MeteoAlarm,
+# que ainda não é chamado por nenhum caminho — crédito de fonte não consultada
+# é atribuição falsa, e ela aparece em 21 entidades.
+ATRIBUICAO: Final = "Open-Meteo (ECMWF, GFS, ICON, MET Norway) · INMET · NWS"

@@ -99,6 +99,10 @@ class Retrato:
     meta: dict = field(default_factory=dict)
     pressao_3h_atras: float | None = None
     atualizado_em: datetime | None = None
+    # Preenchido só quando o dono liga a calibração. Fica SEPARADO do número
+    # fundido de propósito: corrigir em silêncio o valor principal é o tipo de
+    # gentileza que ninguém consegue auditar depois.
+    calibracao: dict | None = None
 
 
 def _momento(

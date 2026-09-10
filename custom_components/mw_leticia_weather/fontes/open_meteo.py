@@ -42,9 +42,10 @@ HORARIAS = (
     "is_day",  # sol ou lua no desenho
 )
 
-# Diárias vêm só do modelo padrão (best_match): mínimo/máximo e sol nascendo já
-# são consenso do provedor, e pedir N modelos aqui dobraria a resposta sem
-# mudar decisão nenhuma.
+# Diárias: a Open-Meteo TAMBÉM as devolve sufixadas por modelo quando se pede
+# `models=` — 57 colunas para 4 modelos. É de propósito: mínima e máxima do dia
+# são exatamente onde os modelos mais discordam, e é essa discórdia que a tela
+# da semana desenha.
 DIARIAS = (
     "weather_code",
     "temperature_2m_max",
@@ -69,6 +70,7 @@ def url(
     modelos: list[str],
     *,
     dias: int = 16,
+    horas: int = 72,
     fuso: str = "auto",
 ) -> str:
     parametros = {
@@ -78,11 +80,18 @@ def url(
         "daily": ",".join(DIARIAS),
         "models": ",".join(modelos),
         "forecast_days": str(max(1, min(int(dias), 16))),
-        # `past_days` e NÃO `past_hours`: com `past_hours` a Open-Meteo IGNORA
-        # `forecast_days` e devolve os 16 dias inteiros na série horária (390
-        # linhas em vez de 96 — medido em 2026-09-09). Um dia de passado é o
-        # que o ponteiro de memória do barômetro precisa.
-        "past_days": "1",
+        # A série horária é cara: são N colunas por MODELO. Pedir 16 dias de
+        # hora em hora para publicar 48 h é pagar 4x de banda por dado que
+        # ninguém lê — 113 KiB contra 30 KiB, medido em 2026-09-09.
+        #
+        # `forecast_hours` + `past_hours` + `forecast_days` CONVIVEM (72
+        # linhas horárias e 16 diárias na mesma resposta). O que não
+        # convive é `past_hours` SOZINHO: aí a API ignora `forecast_days`
+        # e devolve os 16 dias inteiros na série horária.
+        #
+        # As 24 h de passado são o ponteiro de memória do barômetro.
+        "forecast_hours": str(max(6, min(int(horas), 384))),
+        "past_hours": "24",
         "timezone": fuso,
         "timeformat": "unixtime",
         "wind_speed_unit": "kmh",

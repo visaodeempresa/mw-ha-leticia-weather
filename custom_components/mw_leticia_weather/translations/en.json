@@ -8,7 +8,10 @@
           "local": {
             "name": "Location",
             "description": "Where this weather is. The name is what the voice assistant says.",
-            "data": { "nome": "Location name", "coordenada": "Coordinates" }
+            "data": {
+              "nome": "Location name",
+              "coordenada": "Coordinates"
+            }
           },
           "fusao": {
             "name": "Model fusion",
@@ -31,13 +34,20 @@
           "calibracao": {
             "name": "Calibration against a local sensor",
             "description": "Off by default. When on, it publishes a separate entity with the adjusted temperature — the fused value is never overwritten.",
-            "data": { "calibrar": "Calibrate with local sensor", "sensor_local": "Outdoor temperature sensor" }
+            "data": {
+              "calibrar": "Calibrate with local sensor",
+              "sensor_local": "Outdoor temperature sensor"
+            }
           }
         }
       }
     },
-    "error": { "sem_coordenada": "Pick a point on the map." },
-    "abort": { "already_configured": "A location is already configured at this point." }
+    "error": {
+      "sem_coordenada": "Pick a point on the map."
+    },
+    "abort": {
+      "already_configured": "A location is already configured at this point."
+    }
   },
   "options": {
     "step": {
@@ -45,7 +55,13 @@
         "title": "MW Letícia Weather",
         "description": "Changing models, interval or location reloads the integration.",
         "sections": {
-          "local": { "name": "Location", "data": { "nome": "Location name", "coordenada": "Coordinates" } },
+          "local": {
+            "name": "Location",
+            "data": {
+              "nome": "Location name",
+              "coordenada": "Coordinates"
+            }
+          },
           "fusao": {
             "name": "Model fusion",
             "data": {
@@ -64,7 +80,10 @@
           },
           "calibracao": {
             "name": "Calibration against a local sensor",
-            "data": { "calibrar": "Calibrate with local sensor", "sensor_local": "Outdoor temperature sensor" }
+            "data": {
+              "calibrar": "Calibrate with local sensor",
+              "sensor_local": "Outdoor temperature sensor"
+            }
           }
         }
       }
@@ -72,28 +91,71 @@
   },
   "entity": {
     "sensor": {
-      "temperatura": { "name": "Temperature" },
-      "sensacao": { "name": "Feels like" },
-      "confianca": { "name": "Confidence (model disagreement)" },
-      "umidade": { "name": "Humidity" },
-      "pressao": { "name": "Pressure at sea level" },
-      "vento": { "name": "Wind" },
-      "direcao_vento": { "name": "Wind direction" },
-      "uv": { "name": "UV index" },
-      "pm25": { "name": "PM2.5" },
-      "aqi": { "name": "Air quality" },
-      "chuva_probabilidade": { "name": "Chance of rain" },
-      "alertas": { "name": "Alerts" },
-      "previsao": { "name": "Spoken forecast" }
+      "temperatura": {
+        "name": "Temperature"
+      },
+      "sensacao": {
+        "name": "Feels like"
+      },
+      "confianca": {
+        "name": "Confidence (model disagreement)"
+      },
+      "umidade": {
+        "name": "Humidity"
+      },
+      "pressao": {
+        "name": "Pressure at sea level"
+      },
+      "vento": {
+        "name": "Wind"
+      },
+      "direcao_vento": {
+        "name": "Wind direction"
+      },
+      "uv": {
+        "name": "UV index"
+      },
+      "pm25": {
+        "name": "PM2.5"
+      },
+      "aqi": {
+        "name": "Air quality"
+      },
+      "chuva_probabilidade": {
+        "name": "Chance of rain"
+      },
+      "alertas": {
+        "name": "Alerts"
+      },
+      "previsao": {
+        "name": "Spoken forecast"
+      },
+      "temperatura_calibrada": {
+        "name": "Temperature calibrated to the local sensor"
+      }
     },
     "binary_sensor": {
-      "clima_seco": { "name": "Dry air" },
-      "calor": { "name": "Heat" },
-      "frio": { "name": "Cold" },
-      "chuva_forte": { "name": "Heavy rain" },
-      "tempestade": { "name": "Thunderstorm" },
-      "vento_forte": { "name": "High wind" },
-      "uv": { "name": "UV radiation" }
+      "clima_seco": {
+        "name": "Dry air"
+      },
+      "calor": {
+        "name": "Heat"
+      },
+      "frio": {
+        "name": "Cold"
+      },
+      "chuva_forte": {
+        "name": "Heavy rain"
+      },
+      "tempestade": {
+        "name": "Thunderstorm"
+      },
+      "vento_forte": {
+        "name": "High wind"
+      },
+      "uv": {
+        "name": "UV radiation"
+      }
     }
   },
   "services": {
@@ -101,24 +163,47 @@
       "name": "Forecast",
       "description": "Returns the forecast for a configured location or any city in the world, with a ready-to-speak sentence.",
       "fields": {
-        "cidade": { "name": "City", "description": "Free text. Leave empty to use a configured location." },
-        "entry_id": { "name": "Location", "description": "Which configured location to use." },
-        "periodo": { "name": "Period", "description": "agora, hoje, amanha, fim_de_semana or proximos." },
-        "dias": { "name": "Days", "description": "How many days to summarise when the period is proximos." }
+        "cidade": {
+          "name": "City",
+          "description": "Free text. Leave empty to use a configured location."
+        },
+        "entry_id": {
+          "name": "Location",
+          "description": "Which configured location to use."
+        },
+        "periodo": {
+          "name": "Period",
+          "description": "agora, hoje, amanha, fim_de_semana or proximos."
+        },
+        "dias": {
+          "name": "Days",
+          "description": "How many days to summarise when the period is proximos."
+        }
       }
     },
     "alertas": {
       "name": "Alerts",
       "description": "Official and derived alerts for a configured location or any city in the world.",
       "fields": {
-        "cidade": { "name": "City", "description": "Free text. Leave empty to use a configured location." },
-        "entry_id": { "name": "Location", "description": "Which configured location to use." }
+        "cidade": {
+          "name": "City",
+          "description": "Free text. Leave empty to use a configured location."
+        },
+        "entry_id": {
+          "name": "Location",
+          "description": "Which configured location to use."
+        }
       }
     },
     "comparar_fontes": {
       "name": "Compare sources",
       "description": "Shows every model, the consensus, the disagreement and the grid point — the answer for when two apps disagree.",
-      "fields": { "entry_id": { "name": "Location", "description": "Which configured location to use." } }
+      "fields": {
+        "entry_id": {
+          "name": "Location",
+          "description": "Which configured location to use."
+        }
+      }
     }
   }
 }

@@ -114,7 +114,8 @@ jobs:
                  custom_components/mw_leticia_weather/alertas.py \
                  custom_components/mw_leticia_weather/fala.py \
                  custom_components/mw_leticia_weather/codigos.py \
-                 custom_components/mw_leticia_weather/montagem.py"
+                 custom_components/mw_leticia_weather/montagem.py \\
+                 custom_components/mw_leticia_weather/recuo.py"
           if grep -rn "^\s*\(import\|from\) homeassistant" $ALVOS; then
             echo "::error::módulo puro importando homeassistant"
             exit 1
@@ -124,7 +125,7 @@ jobs:
           raiz = pathlib.Path("custom_components/mw_leticia_weather")
           for nome, caminho in (("mww", raiz), ("mww.fontes", raiz / "fontes")):
               m = types.ModuleType(nome); m.__path__ = [str(caminho)]; sys.modules[nome] = m
-          from mww import alertas, codigos, fala, fusao, montagem  # noqa: F401
+          from mww import alertas, codigos, fala, fusao, montagem, recuo  # noqa: F401
           from mww.fontes import ar, avisos_inmet, avisos_nws, geocodificacao, open_meteo  # noqa: F401
           print("módulos puros importam sem HA ✓")
           PY

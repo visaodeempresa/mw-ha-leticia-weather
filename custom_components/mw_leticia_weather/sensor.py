@@ -13,10 +13,10 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
     DEGREE,
     PERCENTAGE,
     EntityCategory,
+    UnitOfDensity,
     UnitOfPressure,
     UnitOfSpeed,
     UnitOfTemperature,
@@ -24,7 +24,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, MODELOS_ROTULO
+from .const import CONF_CALIBRAR, DOMAIN, MODELOS_ROTULO, SECAO_CALIBRACAO
 from .entidade import EntidadeClima
 from .montagem import Retrato
 
@@ -152,7 +152,7 @@ SENSORES: tuple[DescricaoClima, ...] = (
         key="pm25",
         translation_key="pm25",
         device_class=SensorDeviceClass.PM25,
-        native_unit_of_measurement=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        native_unit_of_measurement=UnitOfDensity.MICROGRAMS_PER_CUBIC_METER,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=1,
         valor=lambda r: (r.ar or {}).get("pm2_5"),
@@ -248,11 +248,30 @@ DIAGNOSTICOS = tuple(
 )
 
 
+CALIBRADA = DescricaoClima(
+    key="temperatura_calibrada",
+    translation_key="temperatura_calibrada",
+    device_class=SensorDeviceClass.TEMPERATURE,
+    native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+    state_class=SensorStateClass.MEASUREMENT,
+    suggested_display_precision=1,
+    icon="mdi:target",
+    valor=lambda r: (r.calibracao or {}).get("temperatura"),
+    atributos=lambda r: dict(r.calibracao or {}),
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     coordenador = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities(SensorClima(coordenador, d) for d in (*SENSORES, *DIAGNOSTICOS))
+    descricoes = [*SENSORES, *DIAGNOSTICOS]
+    # A temperatura calibrada só EXISTE quando o dono liga a calibração. Criar
+    # uma entidade que nunca terá valor é fabricar presença de dado (regra 120).
+    fonte = {**entry.data, **entry.options}
+    if (fonte.get(SECAO_CALIBRACAO) or {}).get(CONF_CALIBRAR):
+        descricoes.append(CALIBRADA)
+    async_add_entities(SensorClima(coordenador, d) for d in descricoes)
 
 
 class SensorClima(EntidadeClima, SensorEntity):

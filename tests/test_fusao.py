@@ -97,3 +97,29 @@ def test_pesos_aprendem_mas_ninguem_e_silenciado():
     assert pesos["bom"] > pesos["ruim"]
     assert pesos["ruim"] >= 0.24  # o piso impede degenerar num provedor só
     assert abs(sum(pesos.values()) / len(pesos) - 1.0) < 0.01
+
+
+# ── o recuo, que já esteve invertido ─────────────────────────────────────────
+from mww import recuo  # noqa: E402
+
+
+def test_o_recuo_nunca_acelera():
+    """A primeira versão dava 120 s onde o normal eram 900 — um acelerador
+    disfarçado de backoff. Este teste existe para isso não voltar."""
+    base = 900.0
+    assert recuo.atraso(base, 1) >= base
+    for n in range(1, 12):
+        assert recuo.atraso(base, n) >= base
+
+
+def test_o_recuo_dobra_e_para_no_teto():
+    base = 900.0
+    assert recuo.atraso(base, 1) == 900.0
+    assert recuo.atraso(base, 2) == 1800.0
+    assert recuo.atraso(base, 3) == 3600.0
+    assert recuo.atraso(base, 9) == recuo.atraso(base, 30) == 7200.0
+
+
+def test_o_recuo_aguenta_entrada_estranha():
+    assert recuo.atraso(0, 0) >= 1.0
+    assert recuo.atraso(900, -5) == 900.0
